@@ -1,0 +1,23 @@
+# name: test/sql/elephant_duck.test
+# description: test elephant_duck extension
+# group: [elephant_duck]
+
+# Before we load the extension, this will fail
+statement error
+SELECT elephant_duck('Sam');
+----
+Catalog Error: Scalar Function with name elephant_duck does not exist!
+
+# Require statement will ensure this test is run with this extension loaded
+require elephant_duck
+
+# Confirm the extension works
+query I
+SELECT elephant_duck('Sam');
+----
+ElephantDuck Sam 🐥
+
+query I
+SELECT elephant_duck_openssl_version('Michael');
+----
+<REGEX>:ElephantDuck Michael, my linked OpenSSL version is OpenSSL.*
