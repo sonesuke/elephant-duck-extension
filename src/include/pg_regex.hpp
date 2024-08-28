@@ -2,4 +2,4 @@
 
 #include <string>
 
-int regex_matches(const std::wstring &re, const std::wstring &dat, int nmatch, std::vector<std::wstring> &results);
+int regex_match(const std::string &pattern, const std::string &data, std::vector<std::string> &results);

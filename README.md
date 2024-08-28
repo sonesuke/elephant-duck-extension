@@ -8,6 +8,7 @@ DuckDB's SQL is desgined to be compatible with PostgreSQL, but thare are subtle 
 This extension, Elephant duck, bridges the gap.
 
 
+
 ## Building
 
 ### Git
@@ -57,7 +58,7 @@ To run the extension code, simply start the shell with `./build/release/duckdb`.
 
 Now we can use the features from the extension directly in DuckDB. The template contains a single scalar function `elephant_duck()` that takes a string arguments and returns a string:
 ```
-D select elephant_duck('Jane') as result;
+D SELECT pg_regexp_match('hello([0-9]*)world', 'hello42world') as result;
 ┌───────────────┐
 │    result     │
 │    varchar    │
