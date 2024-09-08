@@ -58,7 +58,7 @@ To run the extension code, simply start the shell with `./build/release/duckdb`.
 
 Now we can use the features from the extension directly in DuckDB. The template contains a single scalar function `elephant_duck()` that takes a string arguments and returns a string:
 ```
-D SELECT pg_regexp_match('hello([0-9]*)world', 'hello42world') as result;
+D SELECT pg_regexp_match('hello42world', 'hello([0-9]*)world') as result;
 ┌───────────────┐
 │    result     │
 │    varchar    │

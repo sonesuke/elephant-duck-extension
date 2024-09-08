@@ -1,0 +1,35 @@
+# name: test/sql/quantified_backrefs.test
+# description: test elephant_duck extension
+# group: [elephant_duck]
+
+
+# Test simple quantified backrefs
+query I
+SELECT pg_regexp_match('bbbbb', '^([bc])\1*$') as result;
+----
+[bbbbb, b]
+
+
+# Test simple quantified backrefs
+query I
+SELECT pg_regexp_match('ccc', '^([bc])\1*$') as result;
+----
+[ccc, c]
+
+
+# Test simple quantified backrefs
+query I
+SELECT pg_regexp_match('xxx', '^([bc])\1*$') as result;
+----
+[]
+
+# Test simple quantified backrefs
+query I
+SELECT pg_regexp_match('bbc', '^([bc])\1*$') as result;
+----
+[]
+
+query I
+SELECT pg_regexp_match('b', '^([bc])\1*$') as result;
+----
+[]

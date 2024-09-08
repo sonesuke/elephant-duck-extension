@@ -1,19 +1,20 @@
-# name: test/sql/elephant_duck.test
+# name: test/sql/pg_regex.test
 # description: test elephant_duck extension
 # group: [elephant_duck]
 
 # Before we load the extension, this will fail
 statement error
-SELECT elephant_duck('Sam');
+SELECT pg_regexp_match('hello42world', 'hello([0-9]*)world') as result;
 ----
-Catalog Error: Scalar Function with name elephant_duck does not exist!
+Catalog Error: Scalar Function with name pg_regexp_match does not exist!
 
 # Require statement will ensure this test is run with this extension loaded
 require elephant_duck
 
 # Confirm the extension works
 query I
-SELECT elephant_duck('Sam');
+SELECT pg_regexp_match('hello42world', 'hello([0-9]*)world') as result;
 ----
-ElephantDuck Sam 🐥
+[hello42world, 42]
+
 

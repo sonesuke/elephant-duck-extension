@@ -8,26 +8,33 @@
 #include "duckdb/main/extension_util.hpp"
 #include <duckdb/parser/parsed_data/create_scalar_function_info.hpp>
 
-
-#include <locale>
-#include <codecvt>
 #include <string>
 #include "pg_regex.hpp"
-
-
 
 namespace duckdb {
 
 inline void PgRegexpMatchScalarFun(DataChunk &args, ExpressionState &state, Vector &result) {
-    auto &data = args.data[0];
-    auto &re = args.data[1];
+    auto &re = args.data[0];
+    auto &data = args.data[1];
     BinaryExecutor::Execute<string_t, string_t, list_entry_t>(data, re, result, args.size(), [&](string_t re, string_t data) {
             vector<std::string> matches;
+            
             int rc = regex_match(data.GetString(),re.GetString(), matches);
-            for (auto &match : matches) {
-                ListVector::PushBack(result, StringVector::AddString(result, match));
-            } 
-            return ListVector::GetData(result);
+            
+            auto current_size = ListVector::GetListSize(result);
+            auto new_size = current_size + matches.size();
+            if (ListVector::GetListCapacity(result) < new_size) {
+				ListVector::Reserve(result, new_size);
+			}
+
+			auto &child_entry = ListVector::GetEntry(result);
+			auto child_vals = FlatVector::GetData<string_t>(child_entry);
+			// auto &child_validity = FlatVector::Validity(child_entry);
+            for (idx_t i = 0; i < matches.size(); i++) {
+                child_vals[current_size + i] = StringVector::AddString(result, matches[i]);
+			}
+			ListVector::SetListSize(result, new_size);
+            return list_entry_t{current_size, matches.size()};
         });
 }
 
@@ -48,7 +55,7 @@ static void LoadInternal(DatabaseInstance &instance) {
     ExtensionUtil::RegisterFunction(instance, elephant_duck_scalar_function);
 
     auto pg_regex_matches_scalar_function = ScalarFunction("pg_regexp_match", {LogicalType::VARCHAR, LogicalType::VARCHAR},
-                                                LogicalType::VARCHAR, PgRegexpMatchScalarFun);
+                                                LogicalType::LIST(LogicalType::VARCHAR), PgRegexpMatchScalarFun);
     ExtensionUtil::RegisterFunction(instance, pg_regex_matches_scalar_function);
 }
 
